@@ -47,7 +47,7 @@ def agent():
     """Minimal AIAgent with mocked OpenAI client and tool loading."""
     with (
         patch(
-            "run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")
+            "run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])
         ),
         patch("run_agent.check_toolset_requirements", return_value={}),
         patch("run_agent.OpenAI"),
@@ -68,7 +68,7 @@ def agent_with_memory_tool():
     with (
         patch(
             "run_agent.get_tool_definitions",
-            return_value=_make_tool_defs("web_search", "memory"),
+            return_value=(_td:=_make_tool_defs("web_search", "memory"), [t["function"]["name"] for t in _td]),
         ),
         patch("run_agent.check_toolset_requirements", return_value={}),
         patch("run_agent.OpenAI"),
@@ -104,7 +104,7 @@ def test_aiagent_reuses_existing_errors_log_handler():
         with (
             patch(
                 "run_agent.get_tool_definitions",
-                return_value=_make_tool_defs("web_search"),
+                return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td]),
             ),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
@@ -353,7 +353,7 @@ class TestInit:
     def test_anthropic_base_url_accepted(self):
         """Anthropic base URLs should route to native Anthropic client."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter._anthropic_sdk") as mock_anthropic,
         ):
@@ -370,7 +370,7 @@ class TestInit:
     def test_prompt_caching_claude_openrouter(self):
         """Claude model via OpenRouter should enable prompt caching."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
@@ -386,7 +386,7 @@ class TestInit:
     def test_prompt_caching_non_claude(self):
         """Non-Claude model should disable prompt caching."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
@@ -402,7 +402,7 @@ class TestInit:
     def test_prompt_caching_non_openrouter(self):
         """Custom base_url (not OpenRouter) should disable prompt caching."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
@@ -419,7 +419,7 @@ class TestInit:
     def test_prompt_caching_native_anthropic(self):
         """Native Anthropic provider should enable prompt caching."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter._anthropic_sdk"),
         ):
@@ -437,7 +437,7 @@ class TestInit:
         """valid_tool_names should contain names from loaded tools."""
         tools = _make_tool_defs("web_search", "terminal")
         with (
-            patch("run_agent.get_tool_definitions", return_value=tools),
+            patch("run_agent.get_tool_definitions", return_value=(tools, [t["function"]["name"] for t in tools])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
@@ -452,7 +452,7 @@ class TestInit:
     def test_session_id_auto_generated(self):
         """Session ID should be auto-generated in YYYYMMDD_HHMMSS_<hex6> format."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
@@ -1629,7 +1629,7 @@ class TestHonchoActivation:
         )
 
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
             patch("honcho_integration.client.HonchoClientConfig.from_global_config", return_value=hcfg),
@@ -1661,7 +1661,7 @@ class TestHonchoActivation:
         manager.get_prefetch_context.return_value = {"representation": "Known user", "card": ""}
 
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
             patch("honcho_integration.client.get_honcho_client") as mock_client,
@@ -1704,14 +1704,14 @@ class TestHonchoActivation:
             patch(
                 "run_agent.get_tool_definitions",
                 side_effect=[
-                    _make_tool_defs("web_search"),
-                    _make_tool_defs(
+                    (_td0 := _make_tool_defs("web_search"), [t["function"]["name"] for t in _td0]),
+                    (_td1 := _make_tool_defs(
                         "web_search",
                         "honcho_context",
                         "honcho_profile",
                         "honcho_search",
                         "honcho_conclude",
-                    ),
+                    ), [t["function"]["name"] for t in _td1]),
                 ],
             ),
             patch("run_agent.check_toolset_requirements", return_value={}),
@@ -1743,7 +1743,7 @@ class TestHonchoActivation:
         )
 
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search", "honcho_context")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search", "honcho_context"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
             patch("honcho_integration.client.HonchoClientConfig.from_global_config", return_value=hcfg),
@@ -1958,7 +1958,7 @@ class TestSafeWriter:
         try:
             hcfg = HonchoClientConfig(enabled=True, api_key="test-honcho-key")
             with (
-                patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+                patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
                 patch("run_agent.check_toolset_requirements", return_value={}),
                 patch("run_agent.OpenAI"),
                 patch("hermes_cli.config.load_config", return_value={"memory": {}}),
@@ -2177,7 +2177,7 @@ class TestAnthropicBaseUrlPassthrough:
 
     def test_custom_proxy_base_url_passed_through(self):
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter.build_anthropic_client") as mock_build,
         ):
@@ -2196,7 +2196,7 @@ class TestAnthropicBaseUrlPassthrough:
 
     def test_none_base_url_passed_as_none(self):
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter.build_anthropic_client") as mock_build,
         ):
@@ -2217,7 +2217,7 @@ class TestAnthropicBaseUrlPassthrough:
 class TestAnthropicCredentialRefresh:
     def test_try_refresh_anthropic_client_credentials_rebuilds_client(self):
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter.build_anthropic_client") as mock_build,
         ):
@@ -2249,7 +2249,7 @@ class TestAnthropicCredentialRefresh:
 
     def test_try_refresh_anthropic_client_credentials_returns_false_when_token_unchanged(self):
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter.build_anthropic_client", return_value=MagicMock()),
         ):
@@ -2276,7 +2276,7 @@ class TestAnthropicCredentialRefresh:
 
     def test_anthropic_messages_create_preflights_refresh(self):
         with (
-            patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+            patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("agent.anthropic_adapter.build_anthropic_client", return_value=MagicMock()),
         ):

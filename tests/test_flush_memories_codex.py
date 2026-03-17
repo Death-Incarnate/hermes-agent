@@ -32,7 +32,7 @@ class _FakeOpenAI:
 
 def _make_agent(monkeypatch, api_mode="chat_completions", provider="openrouter"):
     """Build an AIAgent with mocked internals, ready for flush_memories testing."""
-    monkeypatch.setattr(run_agent, "get_tool_definitions", lambda **kw: [
+    monkeypatch.setattr(run_agent, "get_tool_definitions", lambda **kw: ([
         {
             "type": "function",
             "function": {
@@ -48,7 +48,7 @@ def _make_agent(monkeypatch, api_mode="chat_completions", provider="openrouter")
                 },
             },
         },
-    ])
+    ], ["memory"]))
     monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
     monkeypatch.setattr(run_agent, "OpenAI", _FakeOpenAI)
 

@@ -126,7 +126,7 @@ def _make_cli(model="anthropic/claude-opus-4.6", **kwargs):
     }
     clean_env = {"LLM_MODEL": "", "HERMES_MAX_ITERATIONS": ""}
     with (
-        patch("cli.get_tool_definitions", return_value=[]),
+        patch("cli.get_tool_definitions", return_value=([], [])),
         patch.dict("os.environ", clean_env, clear=False),
         patch.dict(_cli_mod.__dict__, {"CLI_CONFIG": _clean_config}),
     ):
@@ -200,7 +200,7 @@ class TestNormalizeModelForProvider:
         }
         # Don't pass model= so _model_is_default is True
         with (
-            patch("cli.get_tool_definitions", return_value=[]),
+            patch("cli.get_tool_definitions", return_value=([], [])),
             patch.dict("os.environ", {"LLM_MODEL": "", "HERMES_MAX_ITERATIONS": ""}, clear=False),
             patch.dict(_cli_mod.__dict__, {"CLI_CONFIG": _clean_config}),
         ):
@@ -231,7 +231,7 @@ class TestNormalizeModelForProvider:
             "terminal": {"env_type": "local"},
         }
         with (
-            patch("cli.get_tool_definitions", return_value=[]),
+            patch("cli.get_tool_definitions", return_value=([], [])),
             patch.dict("os.environ", {"LLM_MODEL": "", "HERMES_MAX_ITERATIONS": ""}, clear=False),
             patch.dict(_cli_mod.__dict__, {"CLI_CONFIG": _clean_config}),
         ):

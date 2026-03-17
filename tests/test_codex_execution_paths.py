@@ -19,7 +19,7 @@ def _patch_agent_bootstrap(monkeypatch):
     monkeypatch.setattr(
         run_agent,
         "get_tool_definitions",
-        lambda **kwargs: [
+        lambda **kwargs: ([
             {
                 "type": "function",
                 "function": {
@@ -28,7 +28,7 @@ def _patch_agent_bootstrap(monkeypatch):
                     "parameters": {"type": "object", "properties": {}},
                 },
             }
-        ],
+        ], ["terminal"]),
     )
     monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
 

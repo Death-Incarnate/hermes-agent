@@ -36,16 +36,19 @@ def _patch_agent_bootstrap(monkeypatch):
     monkeypatch.setattr(
         run_agent,
         "get_tool_definitions",
-        lambda **kwargs: [
-            {
-                "type": "function",
-                "function": {
-                    "name": "terminal",
-                    "description": "Run shell commands.",
-                    "parameters": {"type": "object", "properties": {}},
-                },
-            }
-        ],
+        lambda **kwargs: (
+            [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "terminal",
+                        "description": "Run shell commands.",
+                        "parameters": {"type": "object", "properties": {}},
+                    },
+                }
+            ],
+            ["terminal"],
+        ),
     )
     monkeypatch.setattr(run_agent, "check_toolset_requirements", lambda: {})
 

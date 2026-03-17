@@ -30,7 +30,7 @@ def _make_tool_defs(*names: str) -> list:
 def _make_agent(fallback_model=None):
     """Create a minimal AIAgent with optional fallback config."""
     with (
-        patch("run_agent.get_tool_definitions", return_value=_make_tool_defs("web_search")),
+        patch("run_agent.get_tool_definitions", return_value=(_td:=_make_tool_defs("web_search"), [t["function"]["name"] for t in _td])),
         patch("run_agent.check_toolset_requirements", return_value={}),
         patch("run_agent.OpenAI"),
     ):

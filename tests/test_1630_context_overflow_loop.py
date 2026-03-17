@@ -25,7 +25,7 @@ class TestGeneric400Heuristic:
     def _make_agent(self):
         """Create a minimal AIAgent for testing error handling."""
         with (
-            patch("run_agent.get_tool_definitions", return_value=[]),
+            patch("run_agent.get_tool_definitions", return_value=([], [])),
             patch("run_agent.check_toolset_requirements", return_value={}),
             patch("run_agent.OpenAI"),
         ):
