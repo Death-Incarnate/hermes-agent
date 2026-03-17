@@ -3338,7 +3338,7 @@ class HermesCLI:
                 if self.compact or term_w < 80:
                     cc.print(_build_compact_banner())
                 else:
-                    tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+                    tools, _ = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
                     cwd = os.getenv("TERMINAL_CWD", os.getcwd())
                     ctx_len = None
                     if hasattr(self, 'agent') and self.agent and hasattr(self.agent, 'context_compressor'):
@@ -4415,7 +4415,7 @@ class HermesCLI:
             # Refresh the agent's tool list so the model can call new tools
             if self.agent is not None:
                 from model_tools import get_tool_definitions
-                self.agent.tools = get_tool_definitions(
+                self.agent.tools, _ = get_tool_definitions(
                     enabled_toolsets=self.agent.enabled_toolsets
                     if hasattr(self.agent, "enabled_toolsets") else None,
                     quiet_mode=True,

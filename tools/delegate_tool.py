@@ -173,11 +173,6 @@ def _build_child_agent(
     from run_agent import AIAgent
     import model_tools
 
-    # Save the parent's resolved tool names before the child agent can
-    # overwrite the process-global via get_tool_definitions().
-    # TODO: remove save/restore after all callers use the returned tuple from get_tool_definitions
-    _saved_tool_names = list(model_tools._last_resolved_tool_names)
-
     # When no explicit toolsets given, inherit from parent's enabled toolsets
     # so disabled tools (e.g. web) don't leak to subagents.
     if toolsets:
@@ -259,7 +254,14 @@ def _run_single_child(
     Run a pre-built child agent. Called from within a thread.
     Returns a structured result dict.
     """
+    import model_tools
+
     child_start = time.monotonic()
+
+    # Save the parent's resolved tool names before the child agent can
+    # overwrite the process-global via get_tool_definitions().
+    # TODO: save/restore no longer needed once all callers use returned names directly
+    _saved_tool_names = list(model_tools._last_resolved_tool_names)
 
     # Get the progress callback from the child agent
     child_progress_cb = getattr(child, 'tool_progress_callback', None)
@@ -373,7 +375,7 @@ def _run_single_child(
     finally:
         # Restore the parent's tool names so the process-global is correct
         # for any subsequent execute_code calls or other consumers.
-        # TODO: remove save/restore after all callers use the returned tuple from get_tool_definitions
+        # TODO: save/restore no longer needed once all callers use returned names directly
         model_tools._last_resolved_tool_names = _saved_tool_names
 
         # Unregister child from interrupt propagation
