@@ -29,6 +29,25 @@ from tools.delegate_tool import (
 )
 
 
+def test_get_tool_definitions_returns_tuple():
+    """get_tool_definitions must return (schemas, names) 2-tuple."""
+    from model_tools import get_tool_definitions
+    result = get_tool_definitions(enabled_toolsets=["terminal"])
+    assert isinstance(result, tuple), f"expected tuple, got {type(result)}"
+    schemas, names = result
+    assert isinstance(schemas, list)
+    assert isinstance(names, list)
+    assert all(isinstance(n, str) for n in names)
+
+
+def test_get_tool_definitions_names_match_schemas():
+    """Returned names must match the function names in the schemas."""
+    from model_tools import get_tool_definitions
+    schemas, names = get_tool_definitions(enabled_toolsets=["terminal"])
+    schema_names = [s["function"]["name"] for s in schemas]
+    assert names == schema_names
+
+
 def _make_mock_parent(depth=0):
     """Create a mock parent agent with the fields delegate_task expects."""
     parent = MagicMock()
@@ -829,6 +848,17 @@ def test_get_tool_definitions_returns_tuple():
     from model_tools import get_tool_definitions
     result = get_tool_definitions(enabled_toolsets=['terminal'])
     assert isinstance(result, tuple), f'expected tuple, got {type(result)}'
+    schemas, names = result
+    assert isinstance(schemas, list)
+    assert isinstance(names, list)
+    assert all(isinstance(n, str) for n in names)
+
+
+def test_get_tool_definitions_returns_name_list():
+    """get_tool_definitions must return (schemas, name_list) tuple after fix."""
+    from model_tools import get_tool_definitions
+    result = get_tool_definitions(enabled_toolsets=["terminal"])
+    assert isinstance(result, tuple), "expected (schemas, names) tuple"
     schemas, names = result
     assert isinstance(schemas, list)
     assert isinstance(names, list)

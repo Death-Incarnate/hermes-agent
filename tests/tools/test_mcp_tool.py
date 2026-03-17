@@ -13,6 +13,45 @@ import pytest
 
 
 # ---------------------------------------------------------------------------
+# MCPError hierarchy tests
+# ---------------------------------------------------------------------------
+
+from tools.mcp_tool import MCPError, MCPTimeoutError, MCPAuthError, MCPConfigError, MCPProtocolError
+
+
+def test_mcp_error_hierarchy():
+    assert issubclass(MCPTimeoutError, MCPError)
+    assert issubclass(MCPAuthError, MCPError)
+    assert issubclass(MCPConfigError, MCPError)
+    assert issubclass(MCPProtocolError, MCPError)
+
+
+def test_mcp_error_is_exception():
+    assert issubclass(MCPError, Exception)
+
+
+def test_mcp_timeout_error_is_retryable():
+    err = MCPTimeoutError("timed out", server_name="test")
+    assert err.retryable is True
+    assert err.server_name == "test"
+
+
+def test_mcp_auth_error_not_retryable():
+    err = MCPAuthError("unauthorized", server_name="test")
+    assert err.retryable is False
+
+
+def test_mcp_config_error_not_retryable():
+    err = MCPConfigError("bad config")
+    assert err.retryable is False
+
+
+def test_mcp_protocol_error_not_retryable():
+    err = MCPProtocolError("parse failure")
+    assert err.retryable is False
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
