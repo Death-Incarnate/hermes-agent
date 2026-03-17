@@ -6,6 +6,22 @@ from unittest.mock import patch, MagicMock
 from agent.context_compressor import ContextCompressor, SUMMARY_PREFIX
 
 
+def test_truncation_limit_scales_with_context():
+    """Larger context window -> larger per-message truncation budget."""
+    with patch("agent.context_compressor.get_model_context_length", return_value=8_000):
+        small = ContextCompressor(model="test-model")
+    with patch("agent.context_compressor.get_model_context_length", return_value=200_000):
+        large = ContextCompressor(model="test-model")
+    assert large._tool_output_truncation_limit > small._tool_output_truncation_limit
+
+
+def test_summary_max_tokens_bounded_by_context():
+    """summary max_tokens must not exceed context_length // 4."""
+    with patch("agent.context_compressor.get_model_context_length", return_value=8_000):
+        comp = ContextCompressor(model="test-model")
+    assert comp._summary_max_tokens <= 8_000 // 4
+
+
 @pytest.fixture()
 def compressor():
     """Create a ContextCompressor with mocked dependencies."""
