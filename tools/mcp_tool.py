@@ -115,6 +115,39 @@ try:
 except ImportError:
     logger.debug("mcp package not installed -- MCP tool support disabled")
 
+
+# ---------------------------------------------------------------------------
+# MCP Error hierarchy
+# ---------------------------------------------------------------------------
+
+class MCPError(Exception):
+    """Base class for all MCP-related errors."""
+    def __init__(self, message: str, server_name: str = '', retryable: bool = False):
+        super().__init__(message)
+        self.server_name = server_name
+        self.retryable = retryable
+
+class MCPTimeoutError(MCPError):
+    """MCP server or tool call timed out. Retryable."""
+    def __init__(self, message: str, server_name: str = ''):
+        super().__init__(message, server_name=server_name, retryable=True)
+
+class MCPAuthError(MCPError):
+    """Authentication or permission failure. Not retryable."""
+    def __init__(self, message: str, server_name: str = ''):
+        super().__init__(message, server_name=server_name, retryable=False)
+
+class MCPConfigError(MCPError):
+    """Bad server configuration. Not retryable."""
+    def __init__(self, message: str, server_name: str = ''):
+        super().__init__(message, server_name=server_name, retryable=False)
+
+class MCPProtocolError(MCPError):
+    """Unexpected protocol response or parse failure. Not retryable."""
+    def __init__(self, message: str, server_name: str = ''):
+        super().__init__(message, server_name=server_name, retryable=False)
+
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -872,6 +905,10 @@ class MCPServerTask:
                     await self._task
                 except asyncio.CancelledError:
                     pass
+                raise MCPTimeoutError(
+                    f"MCP server '{self.name}' shutdown timed out after 10s",
+                    server_name=self.name,
+                )
         self.session = None
 
 

@@ -270,7 +270,7 @@ class HermesAgentBaseEnv(BaseEnv):
                     "Set explicit enabled_toolsets for RL training."
                 )
 
-        tools = get_tool_definitions(
+        tools, _ = get_tool_definitions(
             enabled_toolsets=group_toolsets,
             disabled_toolsets=config.disabled_toolsets,
             quiet_mode=True,

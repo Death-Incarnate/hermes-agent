@@ -1861,7 +1861,7 @@ class HermesCLI:
             self._show_status()
         else:
             # Get tools for display
-            tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+            tools, _ = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
             
             # Get terminal working directory (where commands will execute)
             cwd = os.getenv("TERMINAL_CWD", os.getcwd())
@@ -2347,7 +2347,7 @@ class HermesCLI:
     def _show_status(self):
         """Show current status bar."""
         # Get tool count
-        tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+        tools, _ = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
         tool_count = len(tools) if tools else 0
         
         # Format model name (shorten if needed)
@@ -2411,7 +2411,7 @@ class HermesCLI:
     
     def show_tools(self):
         """Display available tools with kawaii ASCII art."""
-        tools = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
+        tools, _ = get_tool_definitions(enabled_toolsets=self.enabled_toolsets, quiet_mode=True)
         
         if not tools:
             print("(;_;) No tools available")

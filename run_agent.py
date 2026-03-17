@@ -636,7 +636,7 @@ class AIAgent:
                 print(f"🔄 Fallback model: {fb_m} ({fb_p})")
 
         # Get available tools with filtering
-        self.tools = get_tool_definitions(
+        self.tools, _ = get_tool_definitions(
             enabled_toolsets=enabled_toolsets,
             disabled_toolsets=disabled_toolsets,
             quiet_mode=self.quiet_mode,
@@ -1673,7 +1673,7 @@ class AIAgent:
 
         # Rebuild tool surface after Honcho context injection. Tool availability
         # is check_fn-gated and may change once session context is attached.
-        self.tools = get_tool_definitions(
+        self.tools, _ = get_tool_definitions(
             enabled_toolsets=enabled_toolsets,
             disabled_toolsets=disabled_toolsets,
             quiet_mode=True,

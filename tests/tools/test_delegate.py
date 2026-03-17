@@ -824,5 +824,16 @@ class TestDelegationProviderIntegration(unittest.TestCase):
             self.assertEqual(kwargs["base_url"], parent.base_url)
 
 
+def test_get_tool_definitions_returns_tuple():
+    """get_tool_definitions must return (schemas, names) 2-tuple after the fix."""
+    from model_tools import get_tool_definitions
+    result = get_tool_definitions(enabled_toolsets=['terminal'])
+    assert isinstance(result, tuple), f'expected tuple, got {type(result)}'
+    schemas, names = result
+    assert isinstance(schemas, list)
+    assert isinstance(names, list)
+    assert all(isinstance(n, str) for n in names)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -408,7 +408,7 @@ class HermesACPAgent(acp.Agent):
         try:
             from model_tools import get_tool_definitions
             toolsets = getattr(state.agent, "enabled_toolsets", None) or ["hermes-acp"]
-            tools = get_tool_definitions(enabled_toolsets=toolsets, quiet_mode=True)
+            tools, _ = get_tool_definitions(enabled_toolsets=toolsets, quiet_mode=True)
             if not tools:
                 return "No tools available."
             lines = [f"Available tools ({len(tools)}):"]

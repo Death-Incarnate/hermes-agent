@@ -261,10 +261,12 @@ def get_tool_definitions(
         else:
             print("🛠️  No tools selected (all filtered out or unavailable)")
 
+    resolved_names = [t["function"]["name"] for t in filtered_tools]
+    # Keep global updated for legacy callers not yet migrated
     global _last_resolved_tool_names
-    _last_resolved_tool_names = [t["function"]["name"] for t in filtered_tools]
+    _last_resolved_tool_names = resolved_names
 
-    return filtered_tools
+    return filtered_tools, resolved_names
 
 
 # =============================================================================

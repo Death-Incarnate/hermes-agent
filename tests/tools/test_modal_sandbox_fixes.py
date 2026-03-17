@@ -48,7 +48,7 @@ class TestToolResolution:
         if not self._has_minisweagent():
             pytest.skip("minisweagent not installed (git submodule update --init)")
         from model_tools import get_tool_definitions
-        tools = get_tool_definitions(
+        tools, _ = get_tool_definitions(
             enabled_toolsets=["terminal", "file"],
             quiet_mode=True,
         )
@@ -61,7 +61,7 @@ class TestToolResolution:
         if not self._has_minisweagent():
             pytest.skip("minisweagent not installed (git submodule update --init)")
         from model_tools import get_tool_definitions
-        tools = get_tool_definitions(
+        tools, _ = get_tool_definitions(
             enabled_toolsets=["terminal", "file"],
             quiet_mode=True,
         )

@@ -159,7 +159,7 @@ DEFAULT_CONFIG = {
     "compression": {
         "enabled": True,
         "threshold": 0.50,
-        "summary_model": "google/gemini-3-flash-preview",
+        "summary_model": "minimax/minimax-m2.5:free",
         "summary_provider": "auto",
         "summary_base_url": None,
     },

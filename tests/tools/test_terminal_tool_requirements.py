@@ -22,7 +22,7 @@ class TestTerminalRequirements:
             "_get_env_config",
             lambda: {"env_type": "local"},
         )
-        tools = get_tool_definitions(enabled_toolsets=["terminal", "file"], quiet_mode=True)
+        tools, _ = get_tool_definitions(enabled_toolsets=["terminal", "file"], quiet_mode=True)
         names = {tool["function"]["name"] for tool in tools}
         assert "terminal" in names
         assert {"read_file", "write_file", "patch", "search_files"}.issubset(names)

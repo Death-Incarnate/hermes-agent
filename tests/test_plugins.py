@@ -290,7 +290,7 @@ class TestPluginToolVisibility:
         monkeypatch.setattr(plugins_mod, "_plugin_manager", mgr)
 
         from model_tools import get_tool_definitions
-        tools = get_tool_definitions(enabled_toolsets=["terminal"], quiet_mode=True)
+        tools, _ = get_tool_definitions(enabled_toolsets=["terminal"], quiet_mode=True)
         tool_names = [t["function"]["name"] for t in tools]
         assert "vis_tool" in tool_names
 
