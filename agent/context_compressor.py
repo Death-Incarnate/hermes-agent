@@ -55,6 +55,17 @@ class ContextCompressor:
         self.quiet_mode = quiet_mode
 
         self.context_length = get_model_context_length(model, base_url=base_url)
+        # Tool output truncation: scale with context. Floor at 500, ceiling at 10_000.
+        # For an 8k model: ~1500 chars. For a 200k model: ~10_000 chars.
+        self._tool_output_truncation_limit: int = max(
+            500,
+            min(10_000, self.context_length // 5),
+        )
+        # Summary generation max_tokens: must fit within context with room for prompt
+        self._summary_max_tokens: int = min(
+            self.summary_target_tokens * 2,
+            max(512, self.context_length // 4),
+        )
         self.threshold_tokens = int(self.context_length * threshold_percent)
         self.compression_count = 0
         self._context_probed = False  # True after a step-down from context error
@@ -104,7 +115,9 @@ class ContextCompressor:
             role = msg.get("role", "unknown")
             content = msg.get("content") or ""
             if len(content) > 2000:
-                content = content[:1000] + "\n...[truncated]...\n" + content[-500:]
+                head = self._tool_output_truncation_limit
+                tail = head // 2
+                content = content[:head] + "\n...[truncated]...\n" + content[-tail:]
             tool_calls = msg.get("tool_calls", [])
             if tool_calls:
                 tool_names = [tc.get("function", {}).get("name", "?") for tc in tool_calls if isinstance(tc, dict)]
@@ -136,7 +149,7 @@ Write only the summary body. Do not include any preamble or prefix; the system w
                 "task": "compression",
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": 0.3,
-                "max_tokens": self.summary_target_tokens * 2,
+                "max_tokens": self._summary_max_tokens,
                 "timeout": 30.0,
             }
             if self.summary_model:
