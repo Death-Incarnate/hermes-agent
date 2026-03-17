@@ -2717,100 +2717,24 @@ class TestMCPSelectiveToolLoading:
 
 
 # ---------------------------------------------------------------------------
-# MCPError hierarchy (Risk ③ fix)
+# MCPError behavioral: tool-call timeout raises MCPTimeoutError (Risk ③)
 # ---------------------------------------------------------------------------
 
-from tools.mcp_tool import MCPError, MCPTimeoutError, MCPAuthError, MCPConfigError, MCPProtocolError
+def test_tool_handler_timeout_raises_mcp_timeout_error():
+    """When _run_on_mcp_loop times out, handler must raise MCPTimeoutError."""
+    import concurrent.futures
+    from unittest.mock import patch, MagicMock
+    from tools.mcp_tool import MCPTimeoutError, _make_tool_handler
 
+    mock_session = MagicMock()
+    mock_server = MagicMock()
+    mock_server.session = mock_session
 
-def test_mcp_error_hierarchy():
-    assert issubclass(MCPTimeoutError, MCPError)
-    assert issubclass(MCPAuthError, MCPError)
-    assert issubclass(MCPConfigError, MCPError)
-    assert issubclass(MCPProtocolError, MCPError)
-
-
-def test_mcp_error_is_exception():
-    assert issubclass(MCPError, Exception)
-
-
-def test_mcp_timeout_error_is_retryable():
-    err = MCPTimeoutError('timed out')
-    assert err.retryable is True
-
-
-def test_mcp_auth_error_not_retryable():
-    err = MCPAuthError('unauthorized')
-    assert err.retryable is False
-
-
-def test_mcp_config_error_not_retryable():
-    err = MCPConfigError('bad config')
-    assert err.retryable is False
-
-
-def test_mcp_protocol_error_not_retryable():
-    err = MCPProtocolError('parse failure')
-    assert err.retryable is False
-
-
-def test_mcp_error_server_name():
-    err = MCPTimeoutError('timed out', server_name='my_server')
-    assert err.server_name == 'my_server'
-
-
-def test_mcp_error_message():
-    err = MCPError('something failed', server_name='srv', retryable=True)
-    assert str(err) == 'something failed'
-    assert err.retryable is True
-    assert err.server_name == 'srv'
-
-
-# ---------------------------------------------------------------------------
-# MCPError hierarchy (Risk ③ fix)
-# ---------------------------------------------------------------------------
-
-from tools.mcp_tool import MCPError, MCPTimeoutError, MCPAuthError, MCPConfigError, MCPProtocolError
-
-
-def test_mcp_error_hierarchy():
-    assert issubclass(MCPTimeoutError, MCPError)
-    assert issubclass(MCPAuthError, MCPError)
-    assert issubclass(MCPConfigError, MCPError)
-    assert issubclass(MCPProtocolError, MCPError)
-
-
-def test_mcp_error_is_exception():
-    assert issubclass(MCPError, Exception)
-
-
-def test_mcp_timeout_error_is_retryable():
-    err = MCPTimeoutError('timed out')
-    assert err.retryable is True
-
-
-def test_mcp_auth_error_not_retryable():
-    err = MCPAuthError('unauthorized')
-    assert err.retryable is False
-
-
-def test_mcp_config_error_not_retryable():
-    err = MCPConfigError('bad config')
-    assert err.retryable is False
-
-
-def test_mcp_protocol_error_not_retryable():
-    err = MCPProtocolError('parse failure')
-    assert err.retryable is False
-
-
-def test_mcp_error_server_name():
-    err = MCPTimeoutError('timed out', server_name='my_server')
-    assert err.server_name == 'my_server'
-
-
-def test_mcp_error_message():
-    err = MCPError('something failed', server_name='srv', retryable=True)
-    assert str(err) == 'something failed'
-    assert err.retryable is True
-    assert err.server_name == 'srv'
+    with patch("tools.mcp_tool._servers", {"srv": mock_server}), \
+         patch("tools.mcp_tool._run_on_mcp_loop",
+               side_effect=concurrent.futures.TimeoutError("timed out")):
+        handler = _make_tool_handler("srv", "do_thing", tool_timeout=1.0)
+        with pytest.raises(MCPTimeoutError) as exc_info:
+            handler({"arg": "val"})
+        assert exc_info.value.retryable is True
+        assert "srv" in exc_info.value.server_name

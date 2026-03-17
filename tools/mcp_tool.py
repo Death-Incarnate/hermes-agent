@@ -70,6 +70,7 @@ Thread safety:
 """
 
 import asyncio
+import concurrent.futures
 import json
 import logging
 import math
@@ -1037,6 +1038,11 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
 
         try:
             return _run_on_mcp_loop(_call(), timeout=tool_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            raise MCPTimeoutError(
+                f"MCP tool '{server_name}/{tool_name}' timed out after {tool_timeout}s",
+                server_name=server_name,
+            ) from exc
         except Exception as exc:
             logger.error(
                 "MCP tool %s/%s call failed: %s",
@@ -1080,6 +1086,11 @@ def _make_list_resources_handler(server_name: str, tool_timeout: float):
 
         try:
             return _run_on_mcp_loop(_call(), timeout=tool_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            raise MCPTimeoutError(
+                f"MCP server '{server_name}' list_resources timed out after {tool_timeout}s",
+                server_name=server_name,
+            ) from exc
         except Exception as exc:
             logger.error(
                 "MCP %s/list_resources failed: %s", server_name, exc,
@@ -1122,6 +1133,11 @@ def _make_read_resource_handler(server_name: str, tool_timeout: float):
 
         try:
             return _run_on_mcp_loop(_call(), timeout=tool_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            raise MCPTimeoutError(
+                f"MCP server '{server_name}' read_resource timed out after {tool_timeout}s",
+                server_name=server_name,
+            ) from exc
         except Exception as exc:
             logger.error(
                 "MCP %s/read_resource failed: %s", server_name, exc,
@@ -1169,6 +1185,11 @@ def _make_list_prompts_handler(server_name: str, tool_timeout: float):
 
         try:
             return _run_on_mcp_loop(_call(), timeout=tool_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            raise MCPTimeoutError(
+                f"MCP server '{server_name}' list_prompts timed out after {tool_timeout}s",
+                server_name=server_name,
+            ) from exc
         except Exception as exc:
             logger.error(
                 "MCP %s/list_prompts failed: %s", server_name, exc,
@@ -1222,6 +1243,11 @@ def _make_get_prompt_handler(server_name: str, tool_timeout: float):
 
         try:
             return _run_on_mcp_loop(_call(), timeout=tool_timeout)
+        except concurrent.futures.TimeoutError as exc:
+            raise MCPTimeoutError(
+                f"MCP server '{server_name}' get_prompt timed out after {tool_timeout}s",
+                server_name=server_name,
+            ) from exc
         except Exception as exc:
             logger.error(
                 "MCP %s/get_prompt failed: %s", server_name, exc,
