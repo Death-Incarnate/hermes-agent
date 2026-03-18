@@ -53,3 +53,7 @@ environments/benchmarks/evals/
 
 # Release script temp files
 .release_notes.md
+
+# Local plans and private skill ports
+docs/plans/
+skills/openclaw-ported/

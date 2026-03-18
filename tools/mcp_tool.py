@@ -77,6 +77,7 @@ import math
 import os
 import re
 import shutil
+import subprocess
 import threading
 import time
 from typing import Any, Dict, List, Optional
@@ -762,7 +763,7 @@ class MCPServerTask:
         )
 
         sampling_kwargs = self._sampling.session_kwargs() if self._sampling else {}
-        async with stdio_client(server_params) as (read_stream, write_stream):
+        async with stdio_client(server_params, errlog=open(subprocess.DEVNULL, 'w')) as (read_stream, write_stream):
             async with ClientSession(read_stream, write_stream, **sampling_kwargs) as session:
                 await session.initialize()
                 self.session = session
