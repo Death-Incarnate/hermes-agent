@@ -190,10 +190,26 @@ PROVIDER_REGISTRY: Dict[str, ProviderConfig] = {
     "kilocode": ProviderConfig(
         id="kilocode",
         name="Kilo Code",
-        auth_type="api_key",
+        auth_type="***",
         inference_base_url="https://api.kilo.ai/api/gateway",
-        api_key_env_vars=("KILOCODE_API_KEY",),
+        api_key_env_vars=("KILO...",),
         base_url_env_var="KILOCODE_BASE_URL",
+    ),
+    "cerebras": ProviderConfig(
+        id="cerebras",
+        name="Cerebras",
+        auth_type="api_key",
+        inference_base_url="https://api.cerebras.ai/v1",
+        api_key_env_vars=("CEREBRAS_API_KEY",),
+        base_url_env_var="CEREBRAS_BASE_URL",
+    ),
+    "groq": ProviderConfig(
+        id="groq",
+        name="Groq",
+        auth_type="api_key",
+        inference_base_url="https://api.groq.com/openai/v1",
+        api_key_env_vars=("GROQ_API_KEY",),
+        base_url_env_var="GROQ_BASE_URL",
     ),
 }
 
@@ -576,6 +592,8 @@ def resolve_provider(
         "opencode": "opencode-zen", "zen": "opencode-zen",
         "go": "opencode-go", "opencode-go-sub": "opencode-go",
         "kilo": "kilocode", "kilo-code": "kilocode", "kilo-gateway": "kilocode",
+        "cerebras-ai": "cerebras",
+        "groq-ai": "groq",
     }
     normalized = _PROVIDER_ALIASES.get(normalized, normalized)
 
