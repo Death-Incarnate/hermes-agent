@@ -84,7 +84,6 @@ _PROVIDER_MODELS: dict[str, list[str]] = {
         "deepseek-reasoner",
     ],
     "cerebras": [
-        "gpt-oss-120b",
         "qwen-3-235b-a22b-instruct-2507",
         "llama3.1-8b",
     ],
