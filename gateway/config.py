@@ -359,6 +359,7 @@ def load_gateway_config() -> GatewayConfig:
     """
     _home = get_hermes_home()
     gw_data: dict = {}
+    _whatsapp_reply_prefix = None  # may be set from config.yaml below
 
     # Legacy fallback: gateway.json provides the base layer.
     # config.yaml keys always win when both specify the same setting.
@@ -430,15 +431,20 @@ def load_gateway_config() -> GatewayConfig:
                     os.environ["DISCORD_AUTO_THREAD"] = str(discord_cfg["auto_thread"]).lower()
 
             # Bridge whatsapp settings from config.yaml into platform config
+            # (stored for application after config object is created below)
             whatsapp_cfg = yaml_cfg.get("whatsapp", {})
             if isinstance(whatsapp_cfg, dict) and "reply_prefix" in whatsapp_cfg:
-                if Platform.WHATSAPP not in config.platforms:
-                    config.platforms[Platform.WHATSAPP] = PlatformConfig()
-                config.platforms[Platform.WHATSAPP].extra["reply_prefix"] = whatsapp_cfg["reply_prefix"]
+                _whatsapp_reply_prefix = whatsapp_cfg["reply_prefix"]
     except Exception:
         pass
 
     config = GatewayConfig.from_dict(gw_data)
+
+    # Apply whatsapp reply_prefix bridged from config.yaml
+    if _whatsapp_reply_prefix is not None:
+        if Platform.WHATSAPP not in config.platforms:
+            config.platforms[Platform.WHATSAPP] = PlatformConfig()
+        config.platforms[Platform.WHATSAPP].extra["reply_prefix"] = _whatsapp_reply_prefix
 
     # Override with environment variables
     _apply_env_overrides(config)
