@@ -1016,8 +1016,21 @@ def _make_tool_handler(server_name: str, tool_name: str, tool_timeout: float):
                 "error": f"MCP server '{server_name}' is not connected"
             })
 
+        # Coerce JSON-stringified arrays/objects back to their native types.
+        # LLMs sometimes serialize array args as strings (e.g. '["url1","url2"]')
+        # which causes Pydantic validation errors on the MCP server side.
+        coerced: dict = {}
+        for k, v in args.items():
+            if isinstance(v, str) and v and v[0] in ("[", "{"):
+                try:
+                    coerced[k] = json.loads(v)
+                except (json.JSONDecodeError, ValueError):
+                    coerced[k] = v
+            else:
+                coerced[k] = v
+
         async def _call():
-            result = await server.session.call_tool(tool_name, arguments=args)
+            result = await server.session.call_tool(tool_name, arguments=coerced)
             # MCP CallToolResult has .content (list of content blocks) and .isError
             if result.isError:
                 error_text = ""
