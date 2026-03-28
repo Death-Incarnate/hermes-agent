@@ -2,9 +2,9 @@
   <img src="assets/banner.png" alt="Hermes Agent" width="100%">
 </p>
 
-# Hermes Agent ☤
+> This repository is derived from upstream work by [NousResearch/hermes-agent](https://github.com/NousResearch/hermes-agent). Original authorship and core project ownership remain upstream unless explicitly noted otherwise here.
 
-[![Follow @DeadManAI](https://img.shields.io/badge/Follow-@DeadManAI-000000?style=flat-square&logo=x&logoColor=white)](https://x.com/DeadManAI)
+# Hermes Agent ☤
 
 <p align="center">
   <a href="https://hermes-agent.nousresearch.com/docs/"><img src="https://img.shields.io/badge/Docs-hermes--agent.nousresearch.com-FFD700?style=for-the-badge" alt="Documentation"></a>
@@ -177,8 +177,3 @@ python -m pytest tests/ -q
 MIT — see [LICENSE](LICENSE).
 
 Built by [Nous Research](https://nousresearch.com).
-
-
----
-
-Built by [@DeadManAI](https://x.com/DeadManAI) — Army vet. AI builder. Founder of Dead Empire.
